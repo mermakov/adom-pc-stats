@@ -179,10 +179,12 @@ do
 	tmux send-keys \) Qy \ \ nnn
 	sleep $exit_delay
 	mv $src_vlg_path/$i.vlg $vlg_path/
-	iter_measure=$[$i % $step]
-	iter_num=$[$i * 100 / $num]
-	if [ $iter_measure == "0" ]; then
-		echo "$iter_num% ($i characters) done!"
+	if [ ! $step == "0" ]; then
+		iter_measure=$[$i % $step]
+		iter_num=$[$i * 100 / $num]
+		if [ $iter_measure == "0" ]; then
+			echo "$iter_num% ($i characters) done!"
+		fi
 	fi
 done
 
