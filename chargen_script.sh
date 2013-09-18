@@ -88,8 +88,6 @@ adom_exec=$path
 src_vlg_path=$adom_exec
 adom_exec="$adom_exec/adom"
 
-echo $adom_exec
-
 if [ ! -x $adom_exec ]; then
 	echo "./adom not found!"
 	exit 1
@@ -160,6 +158,8 @@ tmux new-session -d -s adom-chargen -x 80 -y 26
 
 cd $cur_path
 
+step=$[$num/10]
+
 for i in `seq 1 $num`
 do
 	sleep $load_delay
@@ -179,6 +179,11 @@ do
 	tmux send-keys \) Qy \ \ nnn
 	sleep $exit_delay
 	mv $src_vlg_path/$i.vlg $vlg_path/
+	iter_measure=$[$i % $step]
+	iter_num=$[$i * 100 / $num]
+	if [ $iter_measure == "0" ]; then
+		echo "$iter_num% ($i characters) done!"
+	fi
 done
 
 
