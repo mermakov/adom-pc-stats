@@ -10,7 +10,7 @@ usage="\
     -v <version>           : ADOM version (1.1.1 or 1.2.0)
     -n <num>               : number of character to generate (default=1000)
     -p <prefix>            : prefix for .vlg files (default=\"vlgs/\")
-    --adom <path>          : path to ADOM executable (default=\"./\")
+    --adom <path>          : path to ADOM folder (default=\"./\")
     --load-delay <delay>   : ADOM loading delay (s) (default=0.5)
     --exit-delay <delay>   : ADOM exit delay (s) (default=0.1)
     --talent-delay <delay> : delay for talent parsing (s) (default=0.5)"
@@ -84,7 +84,7 @@ if [ $num -lt 0 ]; then
 	exit 1
 fi
 
-adom_exec=`dirname $path`
+adom_exec=$path
 src_vlg_path=$adom_exec
 adom_exec="$adom_exec/adom"
 
@@ -153,7 +153,7 @@ if [ ! -d $vlg_path ]; then
 	mkdir $vlg_path
 fi
 
-cd `dirname $path`
+cd $path
 
 tmux start-server
 tmux new-session -d -s adom-chargen -x 80 -y 26
