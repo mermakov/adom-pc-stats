@@ -68,6 +68,9 @@ complexion = {}
 age = {}
 corruptions = {}
 
+history_1_1_1_1 = []
+history_1_1_1_2 = []
+
 for index in range(1, int(sys.argv[2])):
     try:
         vlg_file = open(prefix + str(index) + ".vlg")
@@ -75,6 +78,10 @@ for index in range(1, int(sys.argv[2])):
         continue
     cur_vlg = vlg.Vlg(vlg_file.read())
     all_vlgs.append(cur_vlg)
+    if cur_vlg.history == (1, 11, 21, 31):
+        history_1_1_1_1.append(cur_vlg)
+    if cur_vlg.history == (1, 11, 21, 32):
+        history_1_1_1_2.append(cur_vlg)
     if cur_vlg.age_group == "young":
         young_num += 1
     else:
@@ -103,8 +110,10 @@ for index in range(1, int(sys.argv[2])):
 print get_average_attrs(all_vlgs)
 print str(grown_up_num) + "/" + str(young_num)
 
-print eye_color
-print hair_color
-print complexion
+#print eye_color
+#print hair_color
+#print complexion
 #print age
-print corruptions
+#print corruptions
+print len(history_1_1_1_1)
+print len(history_1_1_1_2)

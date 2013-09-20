@@ -75,7 +75,7 @@ corruption_dict = {
     'flesh of Order':      32
 }
 
-corruption_attr_modifier_dict = {
+corruption_attr_modifier_rules = {
     'astral space':        {},
     'corrupted tissue':    {},
     'grown thorns':        { 'Dx':-2, 'Ap':-3 },
