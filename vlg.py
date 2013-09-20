@@ -75,6 +75,41 @@ corruption_dict = {
     'flesh of Order':      32
 }
 
+corruption_rdict = {
+    1:  'astral space',
+    2:  'corrupted tissue',
+    3:  'grown thorns',
+    4:  'tough scales',
+    5:  'grown horns',
+    6:  'antennae explore',
+    7:  '10 extra eyes',
+    8:  'thin and nimble',
+    9:  'unholy aura',
+    10: 'rage',
+    11: 'into hooves',
+    12: 'mana battery',
+    13: 'bulging cranium',
+    14: 'very light',
+    15: 'have stiffened',
+    16: 'somewhat apish',
+    17: 'fragile stilts',
+    18: 'sport gills',
+    19: 'freezingly cold',
+    20: 'sweat blood',
+    21: 'hate the sun',
+    22: 'attached to ChAoS',
+    23: 'mists of ChAoS',
+    24: 'babbling mouth',
+    25: 'voice of ChAoS',
+    26: 'from bronze',
+    27: 'tentacles',
+    28: 'maggots',
+    29: 'one larger eye',
+    30: 'turned black',
+    31: 'state of decay',
+    32: 'flesh of Order'
+}
+
 corruption_attr_modifier_rules = {
     'astral space':        {},
     'corrupted tissue':    {},

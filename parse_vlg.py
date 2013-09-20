@@ -68,8 +68,10 @@ complexion = {}
 age = {}
 corruptions = {}
 
-history_1_1_1_1 = []
-history_1_1_1_2 = []
+history_1 = []
+history_2 = []
+
+full_corruptions = {}
 
 for index in range(1, int(sys.argv[2])):
     try:
@@ -78,10 +80,11 @@ for index in range(1, int(sys.argv[2])):
         continue
     cur_vlg = vlg.Vlg(vlg_file.read())
     all_vlgs.append(cur_vlg)
-    if cur_vlg.history == (1, 11, 21, 31):
-        history_1_1_1_1.append(cur_vlg)
-    if cur_vlg.history == (1, 11, 21, 32):
-        history_1_1_1_2.append(cur_vlg)
+
+    if 6 in cur_vlg.history:
+        history_1.append(cur_vlg)
+    if 5 in cur_vlg.history:
+        history_2.append(cur_vlg)
     if cur_vlg.age_group == "young":
         young_num += 1
     else:
@@ -107,6 +110,18 @@ for index in range(1, int(sys.argv[2])):
             corruptions[corruption] += 1
         else:
             corruptions[corruption] = 1
+        if corruption in full_corruptions:
+            intern_corr_map = full_corruptions[corruption]
+        else:
+            intern_corr_map = {}
+        for o_corruption in cur_vlg.corruptions:
+            if o_corruption == corruption:
+                continue
+            if o_corruption in intern_corr_map:
+                intern_corr_map[o_corruption] += 1
+            else:
+                intern_corr_map[o_corruption] = 1
+        full_corruptions[corruption] = intern_corr_map
 print get_average_attrs(all_vlgs)
 print str(grown_up_num) + "/" + str(young_num)
 
@@ -115,5 +130,7 @@ print str(grown_up_num) + "/" + str(young_num)
 #print complexion
 #print age
 #print corruptions
-print len(history_1_1_1_1)
-print len(history_1_1_1_2)
+print vlg.int_to_hist(6) + str(get_average_attrs(history_1))
+print vlg.int_to_hist(5) + str(get_average_attrs(history_2))
+print len(history_1)
+print len(history_2)
