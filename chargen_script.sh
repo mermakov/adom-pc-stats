@@ -21,7 +21,7 @@ path="./"
 prefix="vlgs/"
 
 load_delay="0.5"
-exit_delay="0.1"
+exit_delay="0.5"
 talent_delay="0.5"
 
 opts=`getopt -o v:n:r:c:p: --long adom:,load-delay:,exit-delay:,talent-delay: -- "$@"`

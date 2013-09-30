@@ -1,5 +1,85 @@
 import re
 
+race_dict = {
+    'Human':       1,
+    'Troll':       2,
+    'High elf':    3,
+    'Gray elf':    4,
+    'Dark elf':    5,
+    'Dwarf':       6,
+    'Gnome':       7,
+    'Hurthling':   8,
+    'Orc':         9,
+    'Drakeling':   10,
+    'Mist elf':    11,
+    'Ratling':     12
+}
+
+race_rdict = {
+    1:  'Human',
+    2:  'Troll',
+    3:  'High elf',
+    4:  'Gray elf',
+    5:  'Dark elf',
+    6:  'Dwarf',
+    7:  'Gnome',
+    8:  'Hurthling',
+    9:  'Orc',
+    10: 'Drakeling',
+    11: 'Mist elf',
+    12: 'Ratling'
+}
+
+class_dict = {
+    1:  'Fighter',
+    2:  'Paladin',
+    3:  'Ranger',
+    4:  'Thief',
+    5:  'Assassin',
+    6:  'Wizard',
+    7:  'Priest',
+    8:  'Bard',
+    9:  'Monk',
+    10: 'Healer',
+    11: 'Weaponsmith',
+    12: 'Archer',
+    13: 'Merchant',
+    14: 'Farmer',
+    15: 'Mindcrafter',
+    16: 'Necromancer',
+    17: 'Barbarian',
+    18: 'Druid',
+    19: 'Elementalist',
+    20: 'Beastfighter',
+    21: 'Chaos Knight',
+    22: 'Duelist'
+}
+
+class_rdict = {
+    'Fighter':      1,
+    'Paladin':      2,
+    'Ranger':       3,
+    'Thief':        4,
+    'Assassin':     5,
+    'Wizard':       6,
+    'Priest':       7,
+    'Bard':         8,
+    'Monk':         9,
+    'Healer':       10,
+    'Weaponsmith':  11,
+    'Archer':       12,
+    'Merchant':     13,
+    'Farmer':       14,
+    'Mindcrafter':  15,
+    'Necromancer':  16,
+    'Barbarian':    17,
+    'Druid':        18,
+    'Elementalist': 19,
+    'Beastfighter': 20,
+    'Chaos Knight': 21,
+    'Duelist':      22
+}
+
 starsign_dict = {
     'Raven':       1,
     'Book':        2,
@@ -145,6 +225,20 @@ corruption_attr_modifier_rules = {
     'flesh of Order':      {}
 }
 
+merchant_spec_dict = {
+    'magical scrolls and maps': 1,
+    'magical potions':          2,
+    'enchanted wands and rods': 3,
+    'enchanted rings':          4
+}
+
+merchant_spec_rdict = {
+    1:  'magical scrolls and maps',
+    2:  'magical potions',
+    3:  'enchanted wands and rods',
+    4:  'enchanted rings'
+}
+
 corruption_pattern_s = ""
 for corruption in corruption_dict.keys():
     corruption_pattern_s += "|" + corruption
@@ -159,6 +253,8 @@ for starsign in starsign_dict.keys():
 
 starsign_pattern = re.compile(starsign_pattern_s[1:])
 corruption_pattern = re.compile(corruption_pattern_s[1:])
+cclass_pattern = re.compile(r"(?<=Class: )[A-Z][a-z]*")
+race_pattern = re.compile(r"(?<=male )[A-Z][a-z]*")
 skill_pattern = re.compile(r"[a-zA-Z ]* \.* [ \d]\d\s*\([a-z]*\)\s*\[\+[0-9d]*\]")
 skill_parse_pattern = re.compile(r"([A-Z][a-zA-Z ]*[a-z])[ \.]*([0-9]+).*\[(.*)\]")
 attribute_pattern = re.compile(r"[A-Z][a-z]:[ 0-9][0-9](?= )")
@@ -174,6 +270,8 @@ eye_color_pattern = re.compile(r"(?<=Eye color: )[a-z]*")
 hair_color_pattern = re.compile(r"(?<=Hair color: )[a-z]*")
 height_pattern = re.compile(r"(?<=Height: )[a-z\'\"]*")
 complexion_pattern = re.compile(r"(?<=Complexion: )[a-z]*")
+
+merchant_spec_pattern = re.compile(r"(?<=specialized on ).*\.")
 
 starsign_rdict = {
     1:    'Raven',
@@ -306,6 +404,8 @@ class Vlg:
 
     def __init__(self,contents):
         self.starsign = re.search(starsign_pattern, contents).group(0)
+        self.cclass = re.search(cclass_pattern, contents).group(0)
+        self.race = re.search(race_pattern, contents).group(0)
         self.skills = parse_skills(contents)
         self.attributes = parse_attributes(contents)
         self.alignment = re.search(alignment_pattern, contents).group(0)
@@ -321,6 +421,8 @@ class Vlg:
         self.corruptions = []
         for corruption in re.findall(corruption_pattern, contents):
             self.corruptions.append(corruption)
+        if self.cclass == 'Merchant':
+            self.specialization = re.search(merchant_spec_pattern, contents).group(0)
 
     def get_base_attributes(self):
         result = []
