@@ -3,4 +3,7 @@ import sys
 
 file = open("output", "r");
 contents = file.read();
-print re.search("\d of (\d)", contents).group(1)
+try:
+    print re.search("\d of (\d)", contents).group(1)
+except AttributeError:
+    print 0

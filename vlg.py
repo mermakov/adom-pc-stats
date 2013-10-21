@@ -245,7 +245,9 @@ for corruption in corruption_dict.keys():
 
 def apply_attr_modifier_rule(attribute, rule):
     return (attribute[0], - rule.get(attribute[0], 0) + attribute[1])
-    
+
+def remove_spaces(items):
+    return tuple([re.sub("^\s*", "", re.sub("\s*$", "", item)) for item in list(items)])
 
 starsign_pattern_s = ""
 for starsign in starsign_dict.keys():
@@ -259,6 +261,9 @@ skill_pattern = re.compile(r"[a-zA-Z ]* \.* [ \d]\d\s*\([a-z]*\)\s*\[\+[0-9d]*\]
 skill_parse_pattern = re.compile(r"([A-Z][a-zA-Z ]*[a-z])[ \.]*([0-9]+).*\[(.*)\]")
 attribute_pattern = re.compile(r"[A-Z][a-z]:[ 0-9][0-9](?= )")
 attribute_parse_pattern = re.compile(r"(Le|St|Wi|Dx|To|Ap|Ch|Ma|Pe)\:([ 0-9]*)")
+item_pattern = re.compile(r"([a-z0-9][a-zA-Z0-9 ]*)(\(.*\))*\s?(\[.*\])*\s?([+\-][0-9])*\s?(\{.*\})*\s*(?=\[[0-9]*s\])")
+item_multiple_pattern = re.compile(r"(heap of)|(bundle of)|(^\s*[0-9])")
+item_multiple_parse_pattern = re.compile(r"([0-9]+)(.*)s(?: |$)(.*)")
 
 alignment_pattern = re.compile(r"(?<=Pe:[ 0-9]{4})[LCN]")
 gender_pattern = re.compile(r"(?<=Race: )[a-z]*")
@@ -271,7 +276,7 @@ hair_color_pattern = re.compile(r"(?<=Hair color: )[a-z]*")
 height_pattern = re.compile(r"(?<=Height: )[a-z\'\"]*")
 complexion_pattern = re.compile(r"(?<=Complexion: )[a-z]*")
 
-merchant_spec_pattern = re.compile(r"(?<=specialized on ).*\.")
+merchant_spec_pattern = re.compile(r"(?<=specialized on ).*(?=\.)")
 
 starsign_rdict = {
     1:    'Raven',
@@ -382,9 +387,30 @@ def parse_skills(contents):
     skills = re.findall(skill_pattern, contents)
     for skill in skills:
         skill_mo = re.search(skill_parse_pattern, skill)
-        result.append((skill_mo.group(1), int(skill_mo.group(2))))
+        result.append((skill_mo.group(1), int(skill_mo.group(2)), skill_mo.group(3)))
     return result
 
+def parse_items(contents):
+    result = []
+    items = re.findall(item_pattern, contents)
+    for item in items:
+        if re.search(item_multiple_pattern, item[0]) != None:
+            item_multiple = re.search(item_multiple_parse_pattern, item[0])
+            full_item = (item_multiple.group(2) + " " + item_multiple.group(3)),
+            full_item += item[1:]
+            full_item = remove_spaces(full_item)
+            items_parsed = [full_item] * int(item_multiple.group(1))
+        else:
+            items_parsed = [remove_spaces(item)]
+        temp_map = {}
+        for item_parsed in items_parsed:
+            if item_parsed in temp_map:
+                temp_map[item_parsed] += 1
+            else:
+                temp_map[item_parsed] = 1
+        for item_parsed in temp_map:
+            result.append((item_parsed, temp_map[item_parsed]))
+    return result
 
 def parse_attributes(contents):
     result = []
@@ -423,6 +449,7 @@ class Vlg:
             self.corruptions.append(corruption)
         if self.cclass == 'Merchant':
             self.specialization = re.search(merchant_spec_pattern, contents).group(0)
+        self.items = parse_items(contents)
 
     def get_base_attributes(self):
         result = []
@@ -436,8 +463,8 @@ class Vlg:
                 attr = (attr[0], attr[1] - len(self.corruptions) / { 'C':2, 'N':3, 'L':4 }[self.alignment])
             if attr[0] == 'Wi':
                 attr = (attr[0], attr[1] + len(self.corruptions) / { 'C':2, 'N':3, 'L':4 }[self.alignment])
-                if (self.starsign == 'Wand') and (self.alignment == 'N'):
-                    attr = (attr[0], attr[1] - 2)
+            if (attr[0] == 'Ma') and (self.alignment == 'N') and (self.starsign == 'Wand'):
+                attr = (attr[0], attr[1] - 2)
             result.append(attr)
 
         return result    

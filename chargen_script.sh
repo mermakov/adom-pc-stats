@@ -23,6 +23,7 @@ prefix="vlgs/"
 load_delay="0.5"
 exit_delay="0.5"
 talent_delay="0.5"
+talent_retries=5
 
 opts=`getopt -o v:n:r:c:p: --long adom:,load-delay:,exit-delay:,talent-delay: -- "$@"`
 
@@ -113,7 +114,7 @@ case "$class" in
     b) full_class="paladins" ;;
     c) full_class="rangers" ;;
     d) full_class="thieves" ;;
-    e) full_class="assasinds" ;;
+    e) full_class="assasins" ;;
     f) full_class="wizards" ;;
     g) full_class="priests" ;;
     h) full_class="bards" ;;
@@ -153,6 +154,8 @@ fi
 
 cd $path
 
+rm -f ~/.adom.data/.adom.prc
+
 tmux start-server
 tmux new-session -d -s adom-chargen -x 80 -y 26
 
@@ -162,15 +165,31 @@ step=$[$num/10]
 
 for i in `seq 1 $num`
 do
+    adom_running=`ps -A | grep "adom"`
+    if [ ! -z "$adom_running" ]; then
+        pkill -SIGKILL adom
+        rm -f ~/.adom.data/.adom.prc
+    fi
     sleep $load_delay
+    tmux send-keys c-m
     tmux send-keys "./adom|tee $cur_path/output" c-m
     sleep 0.1
     if [ $version == "1.2.0" ]; then
         tmux send-keys c-m
     fi
-    tmux send-keys \ g \ sm"${race}${class}" \ r
+    tmux send-keys \ g \ sf"${race}${class}" \ 
     sleep $talent_delay
     talents=`python parse_output.py`
+    j=0
+    while [ $talents -lt 1 ]
+    do
+        sleep $talent_delay
+        talents=`python parse_output.py`
+        j=$((1+$j))
+        if [ $j -gt $talent_retries ]; then
+            break
+        fi
+    done
     for x in `seq 1 $talents`
     do
         tmux send-keys a
