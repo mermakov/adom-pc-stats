@@ -195,7 +195,12 @@ do
         tmux send-keys a
     done
     tmux send-keys $i c-m
-    tmux send-keys \) Qy \ \ nnn
+    tmux send-keys \) Qy \ \ 
+    if [ $version == "1.1.1" ]; then
+        tmux send-keys nnn
+    elif [ $version == "1.2.0" ]; then
+        tmux send-keys q
+    fi
     sleep $exit_delay
     mv $src_vlg_path/$i.vlg $vlg_path/
     if [ ! $step == "0" ]; then

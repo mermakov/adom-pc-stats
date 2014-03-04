@@ -97,7 +97,7 @@ starsign_dict = {
 
 starsign_attr_modifier_rules = {
     'Raven':       { 'Pe':2 },
-    'Book':        {},
+    'Book':        { 'Le':3 },
     'Wand':        { 'Ch':2 },
     'Unicorn':     { 'Ap':2 },
     'Salamander':  { 'Ch':1, 'Ma':3 },
@@ -391,25 +391,26 @@ def parse_skills(contents):
     return result
 
 def parse_items(contents):
-    result = []
+    result = {}
     items = re.findall(item_pattern, contents)
     for item in items:
         if re.search(item_multiple_pattern, item[0]) != None:
             item_multiple = re.search(item_multiple_parse_pattern, item[0])
-            full_item = (item_multiple.group(2) + " " + item_multiple.group(3)),
+            base_name = item_multiple.group(2)
+            # TODO: normal fix required!
+            if base_name.endswith('he'):
+                base_name = base_name[0:len(base_name) - 1]
+            full_item = (base_name + " " + item_multiple.group(3)),
             full_item += item[1:]
             full_item = remove_spaces(full_item)
             items_parsed = [full_item] * int(item_multiple.group(1))
         else:
             items_parsed = [remove_spaces(item)]
-        temp_map = {}
         for item_parsed in items_parsed:
-            if item_parsed in temp_map:
-                temp_map[item_parsed] += 1
+            if item_parsed in result:
+                result[item_parsed] += 1
             else:
-                temp_map[item_parsed] = 1
-        for item_parsed in temp_map:
-            result.append((item_parsed, temp_map[item_parsed]))
+                result[item_parsed] = 1
     return result
 
 def parse_attributes(contents):
